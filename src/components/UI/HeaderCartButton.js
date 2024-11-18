@@ -1,14 +1,17 @@
 import React from "react";
 import classes from './HeaderCartButton.module.css';
+import CardIcon from './../Cart/CartIcon';
 
 const HeaderCartButton = props =>{
     return(
-        <button>
-            <span>
-                
+        <button className={classes.button}>
+            <span className={classes.icon}>
+                <CardIcon/>
             </span>
-            <span></span>
-            <span></span>
+            <span>Your Cart</span>
+            <span className={classes.badge}>
+                3
+            </span>
         </button>
     );
 }
