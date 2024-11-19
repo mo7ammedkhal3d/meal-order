@@ -3,7 +3,7 @@ const Input = props =>{
     return(
         <div className={classes.input}>
             <label htmlFor={props.input.id} >{props.label}</label>
-            <input id={props.Input.id} {...props.input}/>
+            <input {...props.input}/> 
         </div>
     );
 }
