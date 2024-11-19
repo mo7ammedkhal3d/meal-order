@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import MealsSummmery from './MealsSummery';
+import MealsSummmery from './MealsSummary';
 import AvailableMeals from './AvailableMeals';
 
 const Meals=()=>{
