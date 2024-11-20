@@ -1,5 +1,5 @@
 import React from "react";
-import classes from './Card.module.css';
+import classes from './Cart.module.css';
 import Modal from "../UI/Modal";
 
 const Cart = props =>{
