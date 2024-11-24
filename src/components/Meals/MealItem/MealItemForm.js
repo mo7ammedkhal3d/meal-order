@@ -1,8 +1,8 @@
-import { Fragment,useRef } from 'react';
+import { Fragment,useRef,useState } from 'react';
 import Input from '../../UI/Input';
 import classes from './MealItemForm.module.css'
 const MealItemForm = props =>{
-
+    const [amountIsValid, setAmountIsvalid] = useState(true);
     const amountInputRef = useRef();
 
     const submitHandler = event => {
@@ -12,11 +12,11 @@ const MealItemForm = props =>{
         const enteredAmountNumber = +enteredAmount;
 
         if(enteredAmount.trim().length === 0 || enteredAmountNumber < 1 || enteredAmountNumber > 5){
+            setAmountIsvalid(false);
             return;
         }
 
-        
-
+        props.onAddToCart(enteredAmountNumber);
     }
 
     return(
@@ -33,6 +33,7 @@ const MealItemForm = props =>{
                     defaultValue:'1',}
                 }/>
                 <button>+ Add</button>
+                {!amountIsValid && <p> Please enter a valid amount (1-5). </p>}
             </form>
         </Fragment>
     );
