@@ -8,19 +8,19 @@ const Cart = props =>{
 
     const cartCtx = useContext(CartContext);
 
-    const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`
+    const totalAmount = `$${cartCtx.totlaAmount.toFixed(2)}`
     const hasItems = cartCtx.items.length > 0;
 
     const cartItemRemoveHandler = id => {
-
+        cartCtx.removeItem(id);
     }
 
     const cartItemAddHandler = item => {
-
+        cartCtx.addItem(item);
     }
 
     const cartItems = (
-        <ul className={classes['cart-item']}>
+        <ul className={classes['cart-items']}>
             {cartCtx.items.map((item) => ( 
                 <CartItem 
                     key={item.id}
@@ -36,8 +36,8 @@ const Cart = props =>{
 
     return(
         <Modal onClose={props.onClose}>
+            {cartItems}
             <div className={classes.total}>
-                {cartItems}
                 <span>Total Amount</span>
                 <span>{totalAmount}</span>
             </div>
