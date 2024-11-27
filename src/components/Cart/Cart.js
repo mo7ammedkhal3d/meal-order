@@ -11,16 +11,22 @@ const Cart = props =>{
     const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`
     const hasItems = cartCtx.items.length > 0;
 
-    const cartItemRemoveHandler = id => {
-
+    const cartItemRemoveHandler = id => {                
+        item = cartCtx.items.find(item => item.id !== id);
+        cartCtx.on
     }
 
     const cartItemAddHandler = item => {
-
+        cartCtx.addItem({
+            id: item.id,
+            name: item.name,
+            amount: 1,
+            price: item.price,
+        })
     }
 
     const cartItems = (
-        <ul className={classes['cart-item']}>
+        <ul className={classes['cart-items']}>
             {cartCtx.items.map((item) => ( 
                 <CartItem 
                     key={item.id}
@@ -36,8 +42,8 @@ const Cart = props =>{
 
     return(
         <Modal onClose={props.onClose}>
+            {cartItems}
             <div className={classes.total}>
-                {cartItems}
                 <span>Total Amount</span>
                 <span>{totalAmount}</span>
             </div>
