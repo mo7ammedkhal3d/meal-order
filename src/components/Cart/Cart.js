@@ -17,10 +17,8 @@ const Cart = props =>{
 
     const cartItemAddHandler = item => {
         cartCtx.addItem({
-            id: item.id,
-            name: item.name,
-            amount: 1,
-            price: item.price,
+            ...item,
+            amount:1,
         })
     }
 
