@@ -6,9 +6,10 @@ import CartContext from "../../store/cart-context";
 
 const HeaderCartButton = props =>{
 
-    const [btnIsHighLighted,setBtnIsHighLighted] = useState(false);
+    const [btnIsHighlighted,setbtnIsHighlighted] = useState(false);
 
     const cartCtx = useContext(CartContext);
+
     const { items } = cartCtx;
     
     const numberOfCartItems = items.reduce((curNumber, item) => {
@@ -16,13 +17,21 @@ const HeaderCartButton = props =>{
     },0);  
     
     
-    const btnClasses = `${classes.button} ${btnIsHighLighted ? classes.bump:''}`;
+    const btnClasses = `${classes.button} ${btnIsHighlighted ? classes.bump : ''}`;
 
     useEffect(() => {
         if(items.length === 0){
             return;
         }
-        setBtnIsHighLighted(true);
+        setbtnIsHighlighted(true);
+
+        const timer = setTimeout(()=>{
+            setbtnIsHighlighted(false);
+        },300)
+
+        return ()=> {
+            clearTimeout(timer);
+        }
     },[items]);
     
     return(
