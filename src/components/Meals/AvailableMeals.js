@@ -1,48 +1,59 @@
+import { React, useState, useEffect } from 'react';
 import Card from '../UI/Card';
 import classes from './AvailableMeals.module.css';
 import MealItem from './MealItem/MealItem';
-const DUMMY_MEALS = [
-    {
-      id: 'm1',
-      name: 'Sushi',
-      description: 'Finest fish and veggies',
-      price: 22.99,
-    },
-    {
-      id: 'm2',
-      name: 'Schnitzel',
-      description: 'A german specialty!',
-      price: 16.5,
-    },
-    {
-      id: 'm3',
-      name: 'Barbecue Burger',
-      description: 'American, raw, meaty',
-      price: 12.99,
-    },
-    {
-      id: 'm4',
-      name: 'Green Bowl',
-      description: 'Healthy...and green...',
-      price: 18.99,
-    },
-  ];
+import useHttp from '../../hooks/use-http';
 
 const AvailableMeals = ()=>{
-    const mealsList = DUMMY_MEALS.map( meal =>
-      (<MealItem 
-          id={meal.id}
-          name={meal.name}
-          description={meal.description}
-          price={meal.price}
-      />)
+
+  const [meals, setMeals] = useState([]);
+
+  const { isLoading, error, sendRequest: fetchMeals } = useHttp();
+
+  useEffect(() => {
+    const transformMeals = (mealsObj) => {
+      const loadedMeals = [];
+
+      for (const mealKey in mealsObj) {
+        loadedMeals.push({ 
+          id: mealKey, 
+          name: mealsObj[mealKey].name,
+          description: mealsObj[mealKey].description,
+          price: mealsObj[mealKey].price
+        });
+      }
+
+      setMeals(loadedMeals);
+    };
+
+    fetchMeals(
+      { url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/availableMeals.json'},
+      transformMeals
     );
+  }, [fetchMeals]);
+    
+    let content;
+
+    if(meals.length > 0){
+      content = meals.map( meal =>
+        (<MealItem 
+            id={meal.id}
+            name={meal.name}
+            description={meal.description}
+            price={meal.price}
+        />)
+      );
+    } if(error){
+      content = <p>{error}</p>
+    }if(isLoading){
+      content = <p>Is loading ...</p>
+    }
     
     return(
         <section className={classes.meals}>
             <Card>
               <ul>
-                {mealsList}
+                {content}
               </ul>
             </Card>
         </section>
