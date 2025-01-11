@@ -27,7 +27,7 @@ const AvailableMeals = ()=>{
     };
 
     fetchMeals(
-      { url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/availableMeals.json'},
+      { url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/availableMeals.json'},
       transformMeals
     );
   }, [fetchMeals]);
@@ -37,7 +37,7 @@ const AvailableMeals = ()=>{
     if(meals.length > 0){
       content = meals.map( meal =>
         (<MealItem 
-            id={meal.id}
+            key={meal.id}
             name={meal.name}
             description={meal.description}
             price={meal.price}

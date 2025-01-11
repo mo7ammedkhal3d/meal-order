@@ -7,31 +7,42 @@ import useHttp from "../../hooks/use-http";
 
 const Cart = props =>{
 
-    const { isLoading, error, sendRequest: sendTaskRequest } = useHttp();
+    const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
+
+    let newOrder={};
 
     const createOrder = () => {
         let orderItems = {};
-    for (const item in cartCtx.items) {
-        const generatedId = item.id; 
-        orderItems.push({
-            id: generatedId, 
-            name: item.name,
-            description: item.amount,
-            price: item.price
-        });
-    };
+        for (const item in cartCtx.items) {
+            const generatedId = item.id; 
+            orderItems.append({
+                id: generatedId, 
+                name: item.name,
+                description: item.amount,
+                price: item.price
+            });
+        };
+
+        const generatedId = Math.random();
+
+        newOrder = {
+            id: generatedId,
+            date: new Date(),
+            orderItems: orderItems
+        }
+    }
   
     const enterOrederHandler = async (taskText) => {
-      sendTaskRequest(
+      sendOrderRequest(
         {
-          url: 'https://react-http-6b4a6.firebaseio.com/tasks.json',
+          url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: { text: taskText },
+          body:newOrder,
         },
-        createTask.bind(null, taskText)
+        createOrder
       );
     };
 
@@ -68,6 +79,8 @@ const Cart = props =>{
 
     return(
         <Modal onClose={props.onClose}>
+            {isLoading && <p>Loading ...</p>}
+            {error && <p className={classes['text-error']}>{error}</p>}
             {cartItems}
             <div className={classes.total}>
                 <span>Total Amount</span>
@@ -75,7 +88,7 @@ const Cart = props =>{
             </div>
             <div className={classes.actions}>
                 <button className={classes['buttons--alt']} onClick={props.onClose}>Colse</button>
-                {hasItems && <button className={classes.button} onClick={createOrder}>Order</button>}
+                {hasItems && <button className={classes.button} onClick={enterOrederHandler}>Order</button>}
             </div>
         </Modal>
     );
