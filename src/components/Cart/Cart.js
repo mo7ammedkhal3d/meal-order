@@ -3,8 +3,37 @@ import classes from './Cart.module.css';
 import Modal from "../UI/Modal";
 import CartContext from "../../store/cart-context";
 import CartItem from "./CartItem";
+import useHttp from "../../hooks/use-http";
 
 const Cart = props =>{
+
+    const { isLoading, error, sendRequest: sendTaskRequest } = useHttp();
+
+    const createOrder = () => {
+        let orderItems = {};
+    for (const item in cartCtx.items) {
+        const generatedId = item.id; 
+        orderItems.push({
+            id: generatedId, 
+            name: item.name,
+            description: item.amount,
+            price: item.price
+        });
+    };
+  
+    const enterOrederHandler = async (taskText) => {
+      sendTaskRequest(
+        {
+          url: 'https://react-http-6b4a6.firebaseio.com/tasks.json',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: { text: taskText },
+        },
+        createTask.bind(null, taskText)
+      );
+    };
 
     const cartCtx = useContext(CartContext);
 
@@ -46,7 +75,7 @@ const Cart = props =>{
             </div>
             <div className={classes.actions}>
                 <button className={classes['buttons--alt']} onClick={props.onClose}>Colse</button>
-                {hasItems && <button className={classes.button}>Order</button>}
+                {hasItems && <button className={classes.button} onClick={createOrder}>Order</button>}
             </div>
         </Modal>
     );
