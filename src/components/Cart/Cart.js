@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
 import classes from './Cart.module.css';
 import Modal from "../UI/Modal";
 import CartContext from "../../store/cart-context";
@@ -8,42 +8,37 @@ import useHttp from "../../hooks/use-http";
 const Cart = props =>{
 
     const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
-
-    let newOrder={};
+    const [newOrder, setNewOrder] = useState(null);
 
     const createOrder = () => {
-        let orderItems = {};
-        for (const item in cartCtx.items) {
-            const generatedId = item.id; 
-            orderItems.append({
-                id: generatedId, 
+        console.log('items is sent');
+            
+    }
+  
+    const enterOrderHandler = () => {   
+        let orderItems = [];
+        for (const item of cartCtx.items) {            
+            orderItems.push({
+                id: item.id, 
                 name: item.name,
-                description: item.amount,
+                description: item.description,
                 price: item.price
             });
         };
 
-        const generatedId = Math.random();
-
-        newOrder = {
-            id: generatedId,
+        setNewOrder(JSON.stringify({
             date: new Date(),
             orderItems: orderItems
-        }
-    }
-  
-    const enterOrederHandler = async (taskText) => {
-      sendOrderRequest(
-        {
-          url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body:newOrder,
-        },
-        createOrder
-      );
+        }));  
+
+        sendOrderRequest({
+            url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: newOrder
+        },createOrder);
     };
 
     const cartCtx = useContext(CartContext);
@@ -55,7 +50,7 @@ const Cart = props =>{
         cartCtx.removeItem(id);
     }
 
-    const cartItemAddHandler = item => {
+    const cartItemAddHandler = item => {        
         cartCtx.addItem({
             ...item,
             amount:1,
@@ -88,7 +83,7 @@ const Cart = props =>{
             </div>
             <div className={classes.actions}>
                 <button className={classes['buttons--alt']} onClick={props.onClose}>Colse</button>
-                {hasItems && <button className={classes.button} onClick={enterOrederHandler}>Order</button>}
+                {hasItems && <button className={classes.button} onClick={enterOrderHandler}>Order</button>}
             </div>
         </Modal>
     );

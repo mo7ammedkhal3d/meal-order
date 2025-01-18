@@ -14,6 +14,7 @@ const price = `$${props.price.toFixed(2)}`;
         cartCtx.addItem({
             id: props.id,
             name: props.name,
+            description: props.description,
             amount: amount,
             price: props.price,
         })
