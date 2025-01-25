@@ -1,9 +1,24 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useRef } from 'react';
 import classes from './Checkout.module.css'; 
 import useHttp from '../../hooks/use-http';
 import CartContext from '../../store/cart-context';
 
+const isEmpty = value => value.trim().length === 0;
+const isFiveChars = value => value.trim.length === 5;
+
 const Checkout = props => {
+
+    const [formInputValidity,setformInputValidity] = useState({
+        name: true,
+        street: true,
+        city: true,
+        postalCode: true
+    });
+
+    const nameInputRef = useRef();
+    const streetInputRef = useRef();
+    const postalCodeInputRef = useRef();
+    const cityInputRef = useRef();
 
     const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
     const [newOrder, setNewOrder] = useState(null);
@@ -15,6 +30,32 @@ const Checkout = props => {
 
     const confirmHandler = event => {
         event.preventDefault(); 
+
+        const enteredName = nameInputRef.current.value;
+        const enteredStreet = streetInputRef.current.value;
+        const enteredPostalCode = postalCodeInputRef.current.value;
+        const enteredCity = cityInputRef.current.value;
+
+        const enteredNameIsValid = !isEmpty(enteredName);
+        const enteredStreetIsValid = !isEmpty(enteredStreet);
+        const enteredCityValid = !isEmpty(enteredCity);
+        const enteredPostalCodeValid = isFiveChars(enteredPostalCode);
+
+        setformInputValidity({
+            name: enteredNameIsValid,
+            street: enteredStreetIsValid,
+            city: enteredCityValid,
+            postalCodeInputRef: enteredPostalCodeValid
+        })
+
+        const formIsValid = enteredNameIsValid && 
+        enteredCityValid && 
+        enteredStreetIsValid && 
+        enteredPostalCodeValid;
+
+        if(!formIsValid){
+            return;
+        }
 
         let orderItems = [];
         for (const item of cartCtx.items) {            
@@ -48,19 +89,23 @@ const Checkout = props => {
     return<form  className={classes.form} onSubmit={confirmHandler}>
         <div className={classes.control}>
             <label htmlFor='name'>Your Name</label>
-            <input type='text' id='name'/>
+            <input ref={nameInputRef} type='text' id='name'/>
+            {!formInputValidity.name && <p className='text-error'>Please enter valid name</p>}
         </div>
         <div className={classes.control}>
             <label htmlFor='street'>Street</label>
-            <input type='text' id='street'/>
+            <input ref={streetInputRef} type='text' id='street'/>
+            {!formInputValidity.street && <p className='text-error'>Please enter valid street</p>}
         </div>
         <div className={classes.control}>
             <label htmlFor='postal'>Postal Code</label>
-            <input type='text' id='postal'/>
+            <input ref={postalCodeInputRef} type='text' id='postal'/>
+            {!formInputValidity.postalCode && <p className='text-error'>Please enter valid Postal code</p>}
         </div>
         <div className={classes.control}>
             <label htmlFor='city'>City</label>
-            <input type='text' id='city'/>
+            <input ref={cityInputRef} type='text' id='city'/>
+            {!formInputValidity.city && <p className='text-error'>Please enter valid city</p>}
         </div>
         <div className={classes.actions}>
             <button type='button' className={'buttons--alt'} onClick={props.onCancel}>Cancel</button>
