@@ -45,7 +45,7 @@ const AvailableMeals = ()=>{
         />)
       );
     } if(error){
-      content = <p>{error}</p>
+      content = <p className='text-error'>{error}</p>
     }if(isLoading){
       content = <p>Is loading ...</p>
     }
