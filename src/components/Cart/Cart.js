@@ -26,10 +26,10 @@ const Cart = props =>{
             });
         };
 
-        setNewOrder(JSON.stringify({
+        setNewOrder({
             date: new Date(),
             orderItems: orderItems
-        }));  
+            });  
 
         sendOrderRequest({
             url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',
