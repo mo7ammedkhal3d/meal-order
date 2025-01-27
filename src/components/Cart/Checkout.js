@@ -4,10 +4,9 @@ import useHttp from '../../hooks/use-http';
 import CartContext from '../../store/cart-context';
 
 const isEmpty = value => value.trim().length === 0;
-const isFiveChars = value => value.trim.length === 5;
+const isFiveChars = value => value.trim().length === 5;
 
 const Checkout = props => {
-
     const [formInputValidity,setformInputValidity] = useState({
         name: true,
         street: true,
@@ -40,6 +39,9 @@ const Checkout = props => {
         const enteredStreetIsValid = !isEmpty(enteredStreet);
         const enteredCityValid = !isEmpty(enteredCity);
         const enteredPostalCodeValid = isFiveChars(enteredPostalCode);
+
+        console.log('this is postal code: '+enteredPostalCodeValid);
+        
 
         setformInputValidity({
             name: enteredNameIsValid,
