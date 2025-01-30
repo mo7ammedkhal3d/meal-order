@@ -4,9 +4,11 @@ import Modal from "../UI/Modal";
 import CartContext from "../../store/cart-context";
 import CartItem from "./CartItem";
 import Checkout from "./Checkout";
+import useHttp from '../../hooks/use-http';
 
 const Cart = props =>{
 
+    // const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
     const [isCheckout,setIsCheckout] = useState(false);
     const cartCtx = useContext(CartContext);
 
@@ -28,6 +30,21 @@ const Cart = props =>{
         setIsCheckout(true);
     }
 
+
+    const submitOrderHandler = (userData) => {
+        fetch('https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                orederDate: new Date(),
+                user: userData,
+                orderedItems: cartCtx.items
+            })
+        })
+    };
+
     const cartItems = (
         <ul className={classes['cart-items']}>
             {cartCtx.items.map((item) => ( 
@@ -46,6 +63,7 @@ const Cart = props =>{
             <button className={classes['buttons--alt']} onClick={props.onClose}>Colse</button>
             {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
         </div>
+
     return(
         <Modal onClose={props.onClose}>
             {cartItems}
@@ -53,7 +71,7 @@ const Cart = props =>{
                 <span>Total Amount</span>
                 <span>{totalAmount}</span>
             </div>
-            {isCheckout && <Checkout onCancel={props.onClose}/>}
+            {isCheckout && <Checkout onCancel={props.onClose} onConfirm={submitOrderHandler}/>}
             {!isCheckout && myActions}
         </Modal>
     );
