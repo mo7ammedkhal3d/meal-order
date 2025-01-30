@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import classes from './Cart.module.css';
 import Modal from "../UI/Modal";
 import CartContext from "../../store/cart-context";
@@ -8,9 +8,11 @@ import useHttp from '../../hooks/use-http';
 
 const Cart = props =>{
 
-    // const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
+    const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
     const [isCheckout,setIsCheckout] = useState(false);
     const cartCtx = useContext(CartContext);
+    const checkoutRef = useRef(null);
+    const [sentSuccess,setSentSuccess] = useState(false);
 
     const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`
     const hasItems = cartCtx.items.length > 0;
@@ -30,19 +32,30 @@ const Cart = props =>{
         setIsCheckout(true);
     }
 
+    const dataFormat = (data)=>{
+        console.log(data);    
+        cartCtx.items=[];
+        cartCtx.totalAmount=0;
+        checkoutRef.current.resetForm();
+        setIsCheckout(false);
+        setSentSuccess(true);
+        setTimeout(() => {
+            setSentSuccess(false);
+        }, 2000);
+    }
+
 
     const submitOrderHandler = (userData) => {
-        fetch('https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',{
+        sendOrderRequest({
+            url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+            headers: {'Content-Type': 'application/json'},
+            body: {
                 orederDate: new Date(),
                 user: userData,
                 orderedItems: cartCtx.items
-            })
-        })
+            }
+        },dataFormat);
     };
 
     const cartItems = (
@@ -66,13 +79,22 @@ const Cart = props =>{
 
     return(
         <Modal onClose={props.onClose}>
-            {cartItems}
-            <div className={classes.total}>
-                <span>Total Amount</span>
-                <span>{totalAmount}</span>
+            {error &&<p className="error-text">{error}</p>}
+            {isLoading && <div className={classes['cart-spinner']}>
+                <span></span>
+            </div>}
+            {sentSuccess && <div className={classes['sent-success']}>
+                <p>Your order is Sent successfully 🥰</p>
+            </div>}
+            <div className={classes['cart-body']}>
+                {cartItems}
+                <div className={classes.total}>
+                    <span>Total Amount</span>
+                    <span>{totalAmount}</span>
+                </div>
+                {isCheckout && <Checkout ref={checkoutRef} onCancel={props.onClose} onConfirm={submitOrderHandler}/>}
+                {!isCheckout && myActions}
             </div>
-            {isCheckout && <Checkout onCancel={props.onClose} onConfirm={submitOrderHandler}/>}
-            {!isCheckout && myActions}
         </Modal>
     );
 }

@@ -1,11 +1,11 @@
-import { useState, useContext, useRef } from 'react';
+import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
 import classes from './Checkout.module.css'; 
 
 const isEmpty = value => value.trim().length === 0;
 const isFiveChars = value => value.trim().length === 5;
 
-const Checkout = props => {
-    const [formInputValidity,setformInputValidity] = useState({
+const Checkout = forwardRef((props, ref) => {
+    const [formInputValidity,setFormInputValidity] = useState({
         name: true,
         street: true,
         city: true,
@@ -31,7 +31,7 @@ const Checkout = props => {
         const enteredPostalCodeValid = isFiveChars(enteredPostalCode);
 
 
-        setformInputValidity({
+        setFormInputValidity({
             name: enteredNameIsValid,
             street: enteredStreetIsValid,
             city: enteredCityValid,
@@ -55,6 +55,22 @@ const Checkout = props => {
             city: enteredCity
         });
     };
+
+    useImperativeHandle(ref, () => ({
+        resetForm: () => {
+            nameInputRef.current.value = '';
+            streetInputRef.current.value = '';
+            postalCodeInputRef.current.value = '';
+            cityInputRef.current.value = '';
+
+            setFormInputValidity({
+                name: true,
+                street: true,
+                city: true,
+                postalCode: true
+            });
+        }
+    }));
 
     const nameControlClasses = `${classes.control} ${!formInputValidity.name && classes.invalid}`;
     const streetControlClasses = `${classes.control} ${!formInputValidity.street && classes.invalid}`;
@@ -89,6 +105,6 @@ const Checkout = props => {
         </div>
         
     </form>;
-};
+});
 
 export default Checkout;
