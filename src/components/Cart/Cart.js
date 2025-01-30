@@ -34,8 +34,7 @@ const Cart = props =>{
 
     const dataFormat = (data)=>{
         console.log(data);    
-        cartCtx.items=[];
-        cartCtx.totalAmount=0;
+        cartCtx.clearCart();
         checkoutRef.current.resetForm();
         setIsCheckout(false);
         setSentSuccess(true);
