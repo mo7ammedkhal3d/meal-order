@@ -18,8 +18,9 @@ const useHttp = () => {
         throw new Error('Request failed!');
       }
 
-      const data = await response.json();      
-      dataFormat(data);
+        const data = await response.json();      
+        dataFormat(data);
+
     } catch (err) {
       setError(err.message || 'Something went wrong!');
     }

@@ -1,13 +1,11 @@
-import { useState, useContext, useRef } from 'react';
+import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
 import classes from './Checkout.module.css'; 
-import useHttp from '../../hooks/use-http';
-import CartContext from '../../store/cart-context';
 
 const isEmpty = value => value.trim().length === 0;
 const isFiveChars = value => value.trim().length === 5;
 
-const Checkout = props => {
-    const [formInputValidity,setformInputValidity] = useState({
+const Checkout = forwardRef((props, ref) => {
+    const [formInputValidity,setFormInputValidity] = useState({
         name: true,
         street: true,
         city: true,
@@ -18,14 +16,6 @@ const Checkout = props => {
     const streetInputRef = useRef();
     const postalCodeInputRef = useRef();
     const cityInputRef = useRef();
-
-    const { isLoading, error, sendRequest: sendOrderRequest } = useHttp();
-    const [newOrder, setNewOrder] = useState(null);
-    const cartCtx = useContext(CartContext);
-
-    const createOrder = () => {
-
-    };
 
     const confirmHandler = event => {
         event.preventDefault(); 
@@ -40,15 +30,14 @@ const Checkout = props => {
         const enteredCityValid = !isEmpty(enteredCity);
         const enteredPostalCodeValid = isFiveChars(enteredPostalCode);
 
-        console.log('this is postal code: '+enteredPostalCodeValid);
-        
 
-        setformInputValidity({
+        setFormInputValidity({
             name: enteredNameIsValid,
             street: enteredStreetIsValid,
             city: enteredCityValid,
-            postalCodeInputRef: enteredPostalCodeValid
+            postalCode: enteredPostalCodeValid
         })
+
 
         const formIsValid = enteredNameIsValid && 
         enteredCityValid && 
@@ -59,52 +48,53 @@ const Checkout = props => {
             return;
         }
 
-        let orderItems = [];
-        for (const item of cartCtx.items) {            
-            orderItems.push({
-                id: item.id, 
-                name: item.name,
-                description: item.description,
-                price: item.price
-            });
-        };
-
-        const orderData = {
-            date: new Date(),
-            orderItems: orderItems
-        };  
-    
-        setNewOrder(orderData);
-
-        sendOrderRequest({
-            url: 'https://react-http-e7d8f-default-rtdb.firebaseio.com/meal-order/orders.json',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderData)
-        },createOrder);
-
+        props.onConfirm({
+            name: enteredName,
+            street: enteredStreet,
+            postalCode: enteredPostalCode,
+            city: enteredCity
+        });
     };
+
+    useImperativeHandle(ref, () => ({
+        resetForm: () => {
+            nameInputRef.current.value = '';
+            streetInputRef.current.value = '';
+            postalCodeInputRef.current.value = '';
+            cityInputRef.current.value = '';
+
+            setFormInputValidity({
+                name: true,
+                street: true,
+                city: true,
+                postalCode: true
+            });
+        }
+    }));
+
+    const nameControlClasses = `${classes.control} ${!formInputValidity.name && classes.invalid}`;
+    const streetControlClasses = `${classes.control} ${!formInputValidity.street && classes.invalid}`;
+    const postalCodeControlClasses = `${classes.control} ${!formInputValidity.postalCode && classes.invalid}`;
+    const cityControlClasses = `${classes.control} ${!formInputValidity.city && classes.invalid}`;
 
 
     return<form  className={classes.form} onSubmit={confirmHandler}>
-        <div className={classes.control}>
+        <div className={nameControlClasses}>
             <label htmlFor='name'>Your Name</label>
             <input ref={nameInputRef} type='text' id='name'/>
             {!formInputValidity.name && <p className='text-error'>Please enter valid name</p>}
         </div>
-        <div className={classes.control}>
+        <div className={streetControlClasses}>
             <label htmlFor='street'>Street</label>
             <input ref={streetInputRef} type='text' id='street'/>
             {!formInputValidity.street && <p className='text-error'>Please enter valid street</p>}
         </div>
-        <div className={classes.control}>
+        <div className={postalCodeControlClasses}>
             <label htmlFor='postal'>Postal Code</label>
             <input ref={postalCodeInputRef} type='text' id='postal'/>
-            {!formInputValidity.postalCode && <p className='text-error'>Please enter valid Postal code</p>}
+            {!formInputValidity.postalCode && <p className='text-error'>Please enter valid Postal code (five charachters long)</p>}
         </div>
-        <div className={classes.control}>
+        <div className={cityControlClasses}>
             <label htmlFor='city'>City</label>
             <input ref={cityInputRef} type='text' id='city'/>
             {!formInputValidity.city && <p className='text-error'>Please enter valid city</p>}
@@ -115,6 +105,6 @@ const Checkout = props => {
         </div>
         
     </form>;
-};
+});
 
 export default Checkout;
